@@ -82,6 +82,8 @@ Assertions have been added to verify -
 
 A) API response code - 200
 B) API response schema
+
+
 **Bonus Test has been coded to verify:**
 Assert the first entry in results array has the field “id”
 the value of "id" is a valid UUID v4
