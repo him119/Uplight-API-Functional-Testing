@@ -1,0 +1,735 @@
+{
+	"info": {
+		"_postman_id": "2d0995bd-858a-423f-a1cb-711fefc0e34c",
+		"name": "Uplight API functional Testing",
+		"description": "_**Uplight - Quality Engineering: API Testing Project**_\n\n**Step 1:**  \nPlease tinker around with the OpenVerse API: [https://api.openverse.engineering/v1/](https://api.openverse.engineering/v1/) and  \ncreate a basic automation framework using the language and tools of your choice to test  \nthe standard operations of the API. (You will need to create an account with Openverse to  \ndo this.)  \nPlease create test cases (Positive and Negative) for the below endpoints  \n● POST /v1/auth_tokens/register/ (After this endpoint is hit, you must manually click a  \nlink that is sent to you as an email before you can test the other endpoints.)  \n● POST /v1/auth_tokens/token/  \n● GET /v1/audio/  \n● GET /v1/audio/stats/  \n**Bonus Tests:**\n\n- On the /v1/audio/ endpoint response, assert the first entry in results array has the  \n    field “id” and the value is a valid UUID v4\n    \n- Automate the email verification process while keeping your email credentials  \n    stored securely\n    \n\n\\*Note that if [https://api.openverse.engineering/v1/](https://api.openverse.engineering/v1/) is unavailable, please use  \n[https://dummy.restapiexample.com/](https://dummy.restapiexample.com/) as a backup with its basic CRUD operations as the  \ntest cases.  \nStep 2:  \nPlease write up a brief report detailing the following::\n\n● Explain how your framework is set up and the results of your tests.  \nPlease push your code and report to a public repository of your choice. Also, please be  \nprepared to demo your work (15-20 mins) and consider what improvements could be  \nmade if given more time. This is your opportunity to showcase your QE skills by showing us  \nhow you approach testing. We would love to see how you got there and not just the end  \nproduct! Once complete, email your recruiter contact.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35087960"
+	},
+	"item": [
+		{
+			"name": "OpenVerse API",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate that the response code should be 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/v1/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						""
+					]
+				},
+				"description": "Tinker around with the OpenVerse API: [https://api.openverse.engineering/v1/](https://api.openverse.engineering/v1/) and  \ncreate a basic automation framework using Postman and Java script to test  \nthe standard operations of the API and create test cases."
+			},
+			"response": []
+		},
+		{
+			"name": "Register_201 Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Upon registering, you will receive a client_id and client_secret, which you can then use to authenticate using the standard OAuth2 flow.",
+							"let response = pm.response.json();",
+							"pm.collectionVariables.set('client_id', response.client_id);",
+							"pm.collectionVariables.set('client_secret', response.client_secret);",
+							"",
+							"// Validate that the response code should be 201",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response schema should have properties: client_id, client_secret, name, and msg\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('client_id');",
+							"    pm.expect(responseData).to.have.property('client_secret');",
+							"    pm.expect(responseData).to.have.property('name');",
+							"    pm.expect(responseData).to.have.property('msg');",
+							"});",
+							"",
+							"pm.test(\"Client_id and client_secret should not be empty\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.client_id).to.exist.and.not.to.be.empty;",
+							"    pm.expect(responseData.client_secret).to.exist.and.not.to.be.empty;",
+							"    pm.expect(responseData.msg).to.exist.and.to.eql(\"Check your email for a verification link.\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const uuid = Math.random().toString(36).substring(2, 15) +",
+							"        Math.random().toString(36).substring(2, 15);",
+							"const email = \"user_\" + uuid + \"@mail7.io\";",
+							"const name = \"user_\" + uuid",
+							"pm.collectionVariables.set(\"email\", email);",
+							"pm.collectionVariables.set(\"name\", name);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{name}}\",\n    \"description\": \"Uplight API functional Test\",\n    \"email\": \"{{email}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/auth_tokens/register/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"auth_tokens",
+						"register",
+						""
+					]
+				},
+				"description": "Test the standard operations of the API and create test cases (Positive and Negative) for below endpoint\n\n● **POST /v1/auth_tokens/register/** (After this endpoint is hit, you must manually click a  \nlink that is sent to you as an email before you can test the other endpoints.)\n\n**Automation part :**\n\n**Request:**\n\n1. New random name and email will get generated every time when this end point will be called.\n    \n2. client_id and client_secret received in the response will be saved into collections variable\n    \n\n**Response:**\n\nAssertions have been added to verify -\n\nA) API response code - 201 created\n\nB) API response schema\n\nC) Response Data"
+			},
+			"response": []
+		},
+		{
+			"name": "Register application with same name_400 Bad request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Verify Error code 400 bad request when registering the same name again",
+							"",
+							"// Validate that the response code should be 400",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response schema should have properties: name\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('name');",
+							"});",
+							"",
+							"pm.test(\"o auth2 registration with same name should not be possible\", function () {",
+							"    const responseData = pm.response.json();    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.name).to.exist.and.to.contains(",
+							"        \"o auth2 registration with this name already exists.\"",
+							"    );",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"name\": \"String\",\n\"description\": \"Uplight API functional Test\",\n\"email\": \"hgs.smile@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/auth_tokens/register/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"auth_tokens",
+						"register",
+						""
+					]
+				},
+				"description": "Negative test case - **Register application with same name :**\n\n**Automation part :**\n\n**Response:**\n\nAssertions have been added to verify -\n\nA) API response code - 400\n\nB) API responsedata error"
+			},
+			"response": []
+		},
+		{
+			"name": "Register with invalid email_400 Bad request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Verify Error code 400 bad request when registering with invalid email",
+							"",
+							"// Validate that the response code should be 400",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response schema should have properties: email\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('email');",
+							"});",
+							"",
+							"pm.test(\"Registering with invalid email should not be possible\", function () {",
+							"    const responseData = pm.response.json();    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.email).to.exist.and.to.contains(",
+							"        \"Enter a valid email address.\"",
+							"    );",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"string\",\n  \"description\": \"string\",\n  \"email\": \"test\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/auth_tokens/register/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"auth_tokens",
+						"register",
+						""
+					]
+				},
+				"description": "Negative test case - **Register application with invalid email :**\n\n**Automation part :**\n\n**Response:**\n\nAssertions have been added to verify -\n\nA) API response code - 400\n\nB) API responsedata error"
+			},
+			"response": []
+		},
+		{
+			"name": "Register with Missing name and email_400 Bad request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Verify Error code 400 bad request when registering with missing name and email",
+							"",
+							"// Validate that the response code should be 400",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response schema should have properties: name, email\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('name');",
+							"    pm.expect(responseData).to.have.property('email');",
+							"});",
+							"",
+							"pm.test(\"Registering with missing name and email address should not be possible\", function () {",
+							"    const responseData = pm.response.json();    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.name).to.exist.and.to.contains(",
+							"        \"This field may not be blank.\"",
+							"    );",
+							"    pm.expect(responseData.email).to.exist.and.to.contains(",
+							"        \"This field may not be blank.\"",
+							"    );",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"\",\n  \"description\": \"String\",\n  \"email\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/auth_tokens/register/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"auth_tokens",
+						"register",
+						""
+					]
+				},
+				"description": "Negative test case - **Register application with missing name and email :**\n\n**Automation part :**\n\n**Response:**\n\nAssertions have been added to verify -\n\nA) API response code - 400\n\nB) API responsedata error"
+			},
+			"response": []
+		},
+		{
+			"name": "AuthToken_200 Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Get an access token using client credentials.",
+							"let response = pm.response.json()",
+							"pm.collectionVariables.set('access_token', response.access_token);",
+							"pm.collectionVariables.set('token_type', response.token_type);",
+							"",
+							"// Validate that the response code should be 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response schema should have properties: access_token, expires_in, token_type, and scope\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('access_token');",
+							"    pm.expect(responseData).to.have.property('expires_in');",
+							"    pm.expect(responseData).to.have.property('token_type');",
+							"    pm.expect(responseData).to.have.property('scope');",
+							"});",
+							"",
+							"pm.test(\"Access token should not be empty\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.access_token).to.exist.and.not.to.be.empty;",
+							"});",
+							"pm.test(\"Token type should be Bearer\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.token_type).to.exist.and.to.eqls('Bearer');",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/auth_tokens/token/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"auth_tokens",
+						"token",
+						""
+					]
+				},
+				"description": "Get an access token using client credentials and create positive and negative tests for the end point\n\n● _**POST /v1/auth_tokens/token/**_\n\n**Automation part :**\n\n**Request:**\n\n1. client_id and client_secret received from the /auth_token/register will be passed into this end point.\n    \n2. access_token and token_type received in the response will be saved into the collections variable\n    \n\n**Response:**\n\n1. Assertions have been added to verify -\n    \n\nA) API response code - 200 - access token generated successfully\n\nB) API response schema - token_type should be 'bearer' for the new access token"
+			},
+			"response": []
+		},
+		{
+			"name": "Missing/Invalid grant_type_400 Bad request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Verify Error code 400 bad request when grant type is invalid or missing",
+							"",
+							"// Validate that the response code should be 400",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response schema should have properties: error\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('error');",
+							"    pm.expect(responseData.error).to.exist.and.to.contains(",
+							"        \"unsupported_grant_type\" );",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/auth_tokens/token/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"auth_tokens",
+						"token",
+						""
+					]
+				},
+				"description": "Negative test case - **Call** **auth_token end point with invalid / missing grant_type:**\n\n**Automation part :**\n\n**Response:**\n\nAssertions have been added to verify -\n\nA) API response code - 400\n\nB) API responsedata error"
+			},
+			"response": []
+		},
+		{
+			"name": "Audio",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate that the response code should be 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Validate that the response is json object",
+							"pm.test(\"Response is a json object\", function () {",
+							"    pm.expect(pm.response.json()).to.be.an('object');",
+							"});",
+							"",
+							"// Validate that the response has a 'results' object",
+							"pm.test(\"Response to have 'results' object\", function () {",
+							"    pm.expect(pm.response.json()).to.have.property('results');",
+							"});",
+							"",
+							"// Validate that the response includes the 'id' field in the first entry of the results array",
+							"pm.test(\"Assert the first entry in results array has the field 'id'\", function () {",
+							"    pm.expect(pm.response.json().results[0]).to.have.property('id');",
+							"});",
+							"",
+							"// Validate that the 'id' field value is a valid UUID v4",
+							"pm.test(\"Validate that 'id' field value is a valid UUID v4\", function () {",
+							"    pm.expect(pm.response.json().results[0].id).to.match(/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/v1/audio/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"audio",
+						""
+					]
+				},
+				"description": "Get a list of all audio files in the Openverse catalog and create positive and negative tests for the end point\n\n● _**GET /v1/audio/**_\n\n**Automation part :**\n\n**Response:**\n\n1. Assertions have been added to verify -\n    \n\nA) API response code - 200\n\nB) API response schema\n\n**Bonus Test has been coded to verify:**\n\n1. _Assert the first entry in results array has the field “id”_\n    \n2. _the value of \"id\" is a valid UUID v4_"
+			},
+			"response": []
+		},
+		{
+			"name": "Audio Stats",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate that the response code should be 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Get the statistics for audio sources",
+							"pm.test(\"Get a list of all content providers and their respective number of audio files in the Openverse catalog: source_name, display_name, source_url, logo_url, and media_count\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"    responseData.forEach((data) => {",
+							"        pm.expect(data).to.have.property('source_name');",
+							"        pm.expect(data).to.have.property('display_name');",
+							"        pm.expect(data).to.have.property('source_url');",
+							"        pm.expect(data).to.have.property('logo_url');",
+							"        pm.expect(data).to.have.property('media_count');",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/v1/audio/stats/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"audio",
+						"stats",
+						""
+					]
+				},
+				"description": "Get a list of all content providers and their respective number of audio files in the Openverse catalog and create positive and negative tests for the end point\n\n● _**GET /v1/audio/stats/**_\n\n**Automation part :**\n\n**Response:**\n\n1. Assertions have been added to verify -\n    \n\nA) API response code - 200\n\nB) API response data"
+			},
+			"response": []
+		},
+		{
+			"name": "email verification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the required fields - status and message\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('status');",
+							"    pm.expect(responseData).to.have.property('message');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status is a non-empty string\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('object');",
+							"  pm.expect(responseData.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Message is a non-empty string\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "key",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "{{email}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.mail7.io/inbox?apikey={{mail7key}}&apisecret={{mail7secret}}&to={{name}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"mail7",
+						"io"
+					],
+					"path": [
+						"inbox"
+					],
+					"query": [
+						{
+							"key": "apikey",
+							"value": "{{mail7key}}"
+						},
+						{
+							"key": "apisecret",
+							"value": "{{mail7secret}}"
+						},
+						{
+							"key": "to",
+							"value": "{{name}}"
+						}
+					]
+				},
+				"description": "**Bonus Test has been coded to**\n\n- _Automate the email verification process_"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://api.openverse.org",
+			"type": "string"
+		},
+		{
+			"key": "client_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "client_secret",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_type",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "name",
+			"value": ""
+		}
+	]
+}
